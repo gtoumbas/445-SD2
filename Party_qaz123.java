@@ -23,6 +23,7 @@ public class Party_qaz123 implements Party {
     remaining = new ArrayList<Block>(remaining); // get mutability
     Collections.sort(remaining, new Block.BlockComparator(false, true, false));
     // now increasing order of alpha - beta
+    int tot_size = remaining.size();
     final int districtSize = remaining.size() / r;
     List<List<Block>> ret = new ArrayList<List<Block>>();
     long[] betaSwings = new long[r];
@@ -33,56 +34,56 @@ public class Party_qaz123 implements Party {
 
     //calculate cutoff at which votes are balanced
     int cutoff = 0;
-    long minTot = Math.abs(remaining.get(cutoff).alpha()-remaining.get(cutoff).beta());
     int reverseCutoff = remaining.size() - 1;
-    long revMinTot = Math.abs(remaining.get(reverseCutoff).alpha()-remaining.get(reverseCutoff).beta());
-    long totalSwing = remaining.get(cutoff).alpha()-remaining.get(cutoff).beta();
-    long totalSwingRev = remaining.get(reverseCutoff).alpha()-remaining.get(reverseCutoff).beta();
+    long totalSwing = 0;
+    long totalSwingRev = 0;
     List<Block> remaining_copy = new ArrayList<Block>(remaining);
+    List<Block> remaining_rev = new ArrayList<Block>(remaining);
+    Collections.sort(remaining_rev, new Block.BlockComparator(false, true, true));
 
-    for (int i = 0; i < remaining.size(); ++i) {
-      if(minTot > Math.abs(totalSwing)){
-        minTot = Math.abs(totalSwing);
-        cutoff = i;
+    int idx1 = 0;
+    int dist_idx = 0;
+    for (Block block : remaining) {
+      if((totalSwing>0)){
+        cutoff = idx1;
+        //break;
+        if(_isBeta==true){
+          ret.get(dist_idx).add(remaining.get(idx1));
+          betaSwings[dist_idx] += remaining.get(idx1).betaSwing();
+          remaining_copy.remove(remaining_copy.size()-1);
+          if(ret.get(dist_idx).size() == districtSize) dist_idx += 1;
+        }
+        
       }
-      if(revMinTot > Math.abs(totalSwingRev)){
-        revMinTot = Math.abs(totalSwingRev);
-        reverseCutoff = remaining.size() - i;
-      }
-      totalSwing += remaining.get(i).alpha()-remaining.get(i).beta();
-      totalSwingRev += remaining.get(remaining.size() - i).alpha()-remaining.get(remaining.size() - i).beta();
+      totalSwing += -block.betaSwing();
+      idx1++;
     }
 
-    // remove blocks before or after cutoff
-    if (cutoff > 0 || reverseCutoff < remaining.size()-1){
-      if (totalSwing>0 && _isBeta==true){
-        int dist_idx = 0;
-        for (int i = remaining.size()-1; i > cutoff-1; i--) {
-            ret.get(dist_idx).add(remaining.get(remaining.size()-i));
-            betaSwings[dist_idx] += remaining.get(remaining.size()-i).betaSwing();
-            remaining_copy.remove(remaining_copy.size()-1);
-            if(ret.get(dist_idx).size() == districtSize) dist_idx += 1;
-        }
-
-      }
-      if (totalSwing<0 && _isBeta==false){
-        cutoff = reverseCutoff;
-        int dist_idx = 0;
-        for (int i = 0; i < cutoff; ++i) {
-            ret.get(dist_idx).add(remaining.get(i));
-            betaSwings[dist_idx] += remaining.get(i).betaSwing();
+    if(cutoff == 0){
+      int idx2 = remaining.size()-1;
+      dist_idx = 0;
+      for (Block block : remaining_rev) {
+        if((totalSwingRev<0)){
+          reverseCutoff = idx2;
+          //break;
+          if(_isBeta==false){
+            ret.get(dist_idx).add(remaining.get(idx2));
+            betaSwings[dist_idx] += remaining.get(idx2).betaSwing();
             remaining_copy.remove(0);
             if(ret.get(dist_idx).size() == districtSize) dist_idx += 1;
+          }
         }
+        totalSwingRev += -block.betaSwing();
+        idx2--;
       }
     }
+    
 
     // sort remaining blocks normally and do the same as even cut greedy
     Collections.sort(remaining_copy, new Block.BlockComparator(true, true, true));
-    remaining = remaining_copy;
 
     // this is inefficient, but idrc
-    for (Block block : remaining) {
+    for (Block block : remaining_copy) {
       int extremum = -1;
       for (int i = 0; i < r; ++i) {
         List<Block> district = ret.get(i);
