@@ -36,10 +36,9 @@ public class Party_qaz123 implements Party {
     long minTot = Math.abs(remaining.get(cutoff).alpha()-remaining.get(cutoff).beta());
     int reverseCutoff = remaining.size() - 1;
     long revMinTot = Math.abs(remaining.get(reverseCutoff).alpha()-remaining.get(reverseCutoff).beta());
-    long totalSwing = minTot;
-    long totalSwingRev = revMinTot;
-    List<Block> remaining_copy = new ArrayList<Block>();
-    remaining_copy = remaining;
+    long totalSwing = remaining.get(cutoff).alpha()-remaining.get(cutoff).beta();
+    long totalSwingRev = remaining.get(reverseCutoff).alpha()-remaining.get(reverseCutoff).beta();
+    List<Block> remaining_copy = new ArrayList<Block>(remaining);
 
     for (int i = 0; i < remaining.size(); ++i) {
       if(minTot > Math.abs(totalSwing)){
@@ -58,26 +57,22 @@ public class Party_qaz123 implements Party {
     if (cutoff > 0 || reverseCutoff < remaining.size()-1){
       if (totalSwing>0 && _isBeta==true){
         int dist_idx = 0;
-        for (int i = 0; i < remaining.size(); ++i) {
-          if(remaining.size()-i > cutoff){
+        for (int i = remaining.size()-1; i > cutoff-1; i--) {
             ret.get(dist_idx).add(remaining.get(remaining.size()-i));
             betaSwings[dist_idx] += remaining.get(remaining.size()-i).betaSwing();
             remaining_copy.remove(remaining_copy.size()-1);
             if(ret.get(dist_idx).size() == districtSize) dist_idx += 1;
-          }
         }
 
       }
       if (totalSwing<0 && _isBeta==false){
         cutoff = reverseCutoff;
         int dist_idx = 0;
-        for (int i = 0; i < remaining.size(); ++i) {
-          if(i < cutoff){
+        for (int i = 0; i < cutoff; ++i) {
             ret.get(dist_idx).add(remaining.get(i));
             betaSwings[dist_idx] += remaining.get(i).betaSwing();
             remaining_copy.remove(0);
             if(ret.get(dist_idx).size() == districtSize) dist_idx += 1;
-          }
         }
       }
     }
