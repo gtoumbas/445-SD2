@@ -43,6 +43,7 @@ public class Party_qaz123 implements Party {
 
     int idx1 = 0;
     int dist_idx = 0;
+    int wait = 0;
     for (Block block : remaining) {
       if((totalSwing>0)){
         cutoff = idx1;
@@ -76,12 +77,27 @@ public class Party_qaz123 implements Party {
         totalSwingRev += -block.betaSwing();
         idx2--;
       }
+      if(_isBeta==false){
+        while(ret.get(dist_idx).size() < districtSize){
+          ret.get(dist_idx).add(remaining_copy.get(0));
+          betaSwings[dist_idx] += remaining_copy.get(0).betaSwing();
+          remaining_copy.remove(0);
+        }
+      }
+    }else{
+      if(_isBeta==true){
+        while(ret.get(dist_idx).size() < districtSize){
+          ret.get(dist_idx).add(remaining_copy.get(remaining_copy.size()-1));
+          betaSwings[dist_idx] += remaining_copy.get(remaining_copy.size()-1).betaSwing();
+          remaining_copy.remove(remaining_copy.size()-1);
+        }
+      }
     }
     
 
     // sort remaining blocks normally and do the same as even cut greedy
     Collections.sort(remaining_copy, new Block.BlockComparator(true, true, true));
-
+    //Collections.shuffle(remaining_copy);
     // this is inefficient, but idrc
     for (Block block : remaining_copy) {
       int extremum = -1;
