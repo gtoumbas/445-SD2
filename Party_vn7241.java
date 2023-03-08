@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Party_qaz123 implements Party {
+public class Party_vn7241 implements Party {
   final boolean _isBeta;
 
-  private Party_qaz123(boolean isBeta) {
+  private Party_vn7241(boolean isBeta) {
     _isBeta = isBeta;
   }
   // must construct and return a Party based on the provided blocks. Do any initialization here.
   public static Party New(boolean isBeta, int numDistricts, List<Block> blocks) {
-    return new Party_qaz123(isBeta);
+    return new Party_vn7241(isBeta);
   }
 
   // Make the most even districts easily possible (e.g. greedily put the districts with the biggest
